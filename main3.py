@@ -2,12 +2,13 @@
 import os
 from typing import Callable, Optional, Union
 import PyHook3
-import keyboard
 import pythoncom
 import win32api
+# noinspection PyPackageRequirements
 import win32gui
 import win32con
 from ctypes import windll, byref, Structure, c_short
+import yaml
 
 
 # noinspection PyMethodMayBeStatic
@@ -29,21 +30,18 @@ class MyHook:
         self.hook_manager: Optional[PyHook3.HookManager] = None
         # 鼠标锁定状态
         self.cursorLocked = False
-        # 键: 函数 是否保留按键原功能
+        # 键: 函数,是否保留按键原功能,函数额外参数
         self.key_func_map = {}  # {key:(func,return,args)}
         # 初始化功能键绑定
         self.config = self._get_config_from_yml()
         self._init_key_binding()
         # 初始化按键热键绑定
         if enable_hotkey:
-            import keyboard
             self._init_hotkey_binding()
         if enable_command:
             self._init_command_binding()
 
     def _get_config_from_yml(self) -> Optional[dict]:
-        import yaml
-        import os
         config_path = "hotkey_map.yml"
         if os.path.isfile(config_path):
             config = yaml.safe_load(open(config_path, "r", encoding="utf8"))
@@ -154,7 +152,7 @@ class MyHook:
 
             windll.user32.ClipCursor(byref(rect))
             self.cursorLocked = True
-            # @https://codingdict.com/sources/py/pyglet/17307.html
+            # see @https://codingdict.com/sources/py/pyglet/17307.html
 
     def run_command(self, command: str):
         """运行一串控制台命令"""
@@ -170,9 +168,17 @@ class MyHook:
         print("卸载钩子成功，准备退出")
 
     def _bind_key(self, key: str, method: Callable, enable_key: bool = True, args: Union[tuple, str] = None):
+        """绑定按键到功能的函数
+
+        :param key: 键盘按键，参考 PyHook3.KeyboardEvent.Key
+        :param method: 实现某功能的函数，也可以是自定义的任何函数
+        :param enable_key: 是否保留按键原功能
+        :param args: method 所需的额外参数
+        """
         self.key_func_map[key] = (method, enable_key, args)
 
     def _init_key_binding(self):
+        """绑定主要功能键"""
         self._bind_key("F3", self.toggle_window_show_hide, False)
         self._bind_key("F4", self.toggle_window_show_hide, True)
         self._bind_key("Pause", self.toggle_topmost, False)
@@ -181,6 +187,8 @@ class MyHook:
         self._bind_key("Snapshot", self.stop_hooking, True)
 
     def _init_hotkey_binding(self):
+        """绑定热键"""
+        import keyboard
         if self.config and self.config["hotkey_binding"]:
             hotkey_map: dict = self.config["hotkey_binding"]
             for old_key in hotkey_map:
@@ -188,13 +196,15 @@ class MyHook:
                 self._bind_key(old_key, keyboard.send, False, new_key.lower())
 
     def _init_command_binding(self):
+        """绑定控制台指令"""
         if self.config and self.config["command_binding"]:
             command_map: dict = self.config["command_binding"]
             for key in command_map:
                 self._bind_key(key, self.run_command, False, command_map[key])
 
     def repr_keybinding(self) -> str:
-        keybind_str = "made by SY\nkey Mapping{\n"
+        """描述按键绑定状态"""
+        key_bind_str = "made by SY\nkey Mapping{\n"
         for key in self.key_func_map:
             method, enable_key, args = self.key_func_map[key]
             method: Callable
@@ -203,15 +213,14 @@ class MyHook:
             else:
                 method_str = f"{method}"
 
-            keybind_str += f"  {key:<10} -> {method_str:　<20}, {'保留按键' if enable_key else '不保留按键'}, {f'[{args}]' if args else ''}\n"
+            key_bind_str += f"  {key:<10} -> {method_str:　<20}, {'保留按键' if enable_key else '不保留按键'}, {f'[{args}]' if args else ''}\n"
 
-        keybind_str += "}"
-        return keybind_str
+        key_bind_str += "}"
+        return key_bind_str
 
     def onKeyboardEvent(self, event: PyHook3.KeyboardEvent):
-        # from objprint import op
-        # op(event)
-        if event.Key in self.key_func_map and not event.Injected:  # 该按键已被监听且是原生键盘事件
+        """主要监听函数"""
+        if event.Key in self.key_func_map and not event.Injected:  # 该按键已被监听且是原生键盘事件，防止热键传递
             func, enable_key, args = self.key_func_map[event.Key]
             if args and isinstance(args, tuple):
                 func(*args)
@@ -223,16 +232,12 @@ class MyHook:
         return True
 
     def start_hooking(self):
-        # 创建一个钩子“管理对象
-        self.hook_manager = PyHook3.HookManager()
+        # @Note: 也试过用 keyboard 包的键盘钩子方案，但是好像没有PyHook3的快
 
-        # 绑定监听函数
+        self.hook_manager = PyHook3.HookManager()
         self.hook_manager.KeyDown = self.onKeyboardEvent
-        # 设置键盘钩子
         self.hook_manager.HookKeyboard()
-        # 循环监听
-        # win32gui.PumpMessages()
-        pythoncom.PumpMessages()
+        pythoncom.PumpMessages()  # alternative: win32gui.PumpMessages()
 
 
 # %%
