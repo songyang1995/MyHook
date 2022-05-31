@@ -5,7 +5,7 @@
 1. 下载本仓库
 2. 在vbs文件内配置你的python路径
 3. 安装所需python包
-4. additional - 你可以自定义按键绑定（在MyHook._init_），目前我用的绑定方案是：
+4. additional - 你可以自定义按键绑定`（在MyHook._init_key_binding 、 MyHook._init_hotkey_binding 、 MyHook._init_command_binding 处）`，目前我用的绑定方案是：
 ```
 key Mapping{
   F3         -> 隐藏当前窗口/显示窗口　　　　　　　　　, 不保留按键, 
