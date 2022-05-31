@@ -1,0 +1,5 @@
+hotkey_binding:
+
+command_binding:
+  O: 'cp -rf C:\Users\SY\AppData\Local\AVGame\Saved\SaveGames C:\Users\SY\AppData\Local\AVGame\Saved\SaveGames-backup'
+  P: 'cp -rf C:\Users\SY\AppData\Local\AVGame\Saved\SaveGames-backup C:\Users\SY\AppData\Local\AVGame\Saved\SaveGames'
