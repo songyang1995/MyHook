@@ -18,3 +18,4 @@ key Mapping{
   P          -> 运行command命令　　　　　　　　　, 不保留按键, [cp -rf someFile2 someFile1]
 }
 ```
+5. 双击或通过命令行运行vbs脚本，完全隐藏本程序（后台运行）
