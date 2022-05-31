@@ -1,4 +1,3 @@
-# %%
 import os
 from typing import Callable, Optional, Union
 import PyHook3
@@ -233,14 +232,11 @@ class MyHook:
 
     def start_hooking(self):
         # @Note: 也试过用 keyboard 包的键盘钩子方案，但是好像没有PyHook3的快
-
         self.hook_manager = PyHook3.HookManager()
         self.hook_manager.KeyDown = self.onKeyboardEvent
         self.hook_manager.HookKeyboard()
         pythoncom.PumpMessages()  # alternative: win32gui.PumpMessages()
 
-
-# %%
 def main():
     my_hook = MyHook(enable_hotkey=False)
     print(my_hook.repr_keybinding())
