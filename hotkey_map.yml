@@ -1,5 +1,7 @@
+# 按键快捷键（改键，不保留原按键功能），格式为 [旧键]:[新键]
 hotkey_binding:
 
+# 命令快捷键，格式为：[按键]:'[命令]'
 command_binding:
-  O: 'cp -rf C:\Users\SY\AppData\Local\AVGame\Saved\SaveGames C:\Users\SY\AppData\Local\AVGame\Saved\SaveGames-backup'
-  P: 'cp -rf C:\Users\SY\AppData\Local\AVGame\Saved\SaveGames-backup C:\Users\SY\AppData\Local\AVGame\Saved\SaveGames'
+  O: 'cp -rf [file1] [file2]'
+  P: 'cp -rf [file2] [file1]'
