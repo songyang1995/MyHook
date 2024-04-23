@@ -5,7 +5,7 @@ import pythoncom
 import win32api
 import yaml
 
-from MyHook import hotkey_features, base_feature, win_features
+from . import simple_features, base_feature, win_features
 
 
 class MyHook:
@@ -13,7 +13,7 @@ class MyHook:
         self.config_path = config_path
         self.hook_manager = PyHook3.HookManager()
         self._key_map = dict()  # {key:(feature,keep_old_key)}
-        self._stop_hooking_feature = base_feature.RunCallable(self._stop_hooking)
+        self._stop_hooking_feature = hotkey_features.RunCallable(self._stop_hooking)
         self.config = self._init_config()
         self.stop_hooking_feature_binded = False
 

@@ -2,7 +2,7 @@ from ctypes import windll, byref, Structure, c_short
 import win32gui
 import win32con
 
-from MyHook.base_feature import BaseFeature, SingletonFeature
+from .base_feature import BaseFeature, SingletonFeature
 
 
 class ToggleWindowTopmost(BaseFeature, SingletonFeature):
@@ -70,10 +70,11 @@ class ToggleWindowShowHide(BaseFeature, SingletonFeature):
         # print(type(hwnd))
         # print(win32gui.GetWindowText(hwnd), "is hided")
         win32gui.SetWindowPos(hwnd, win32con.HWND_NOTOPMOST, 0, 0, 0, 0,
-                              win32con.SWP_HIDEWINDOW |
-                              win32con.SWP_NOMOVE |
-                              win32con.SWP_NOSIZE |
-                              win32con.SWP_NOACTIVATE)
+                              win32con.SWP_HIDEWINDOW
+                              | win32con.SWP_NOMOVE
+                              | win32con.SWP_NOSIZE
+                              | win32con.SWP_NOACTIVATE
+                              )
         return hwnd
 
     @staticmethod
@@ -81,9 +82,10 @@ class ToggleWindowShowHide(BaseFeature, SingletonFeature):
         """显示隐藏的窗口"""
         # (win32gui.GetWindowText(hwnd), "is shown")
         win32gui.SetWindowPos(hwnd, win32con.HWND_TOP, 0, 0, 0, 0,
-                              win32con.SWP_SHOWWINDOW |
-                              win32con.SWP_NOMOVE |
-                              win32con.SWP_NOSIZE)
+                              win32con.SWP_SHOWWINDOW
+                              | win32con.SWP_NOMOVE
+                              | win32con.SWP_NOSIZE
+                              )
 
 
 class ToggleWindowFullScreen(BaseFeature, SingletonFeature):

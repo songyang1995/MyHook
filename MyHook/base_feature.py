@@ -1,7 +1,6 @@
 import abc
 import threading
 import warnings
-from typing import Callable
 
 
 class BaseFeature(abc.ABC):
@@ -10,7 +9,7 @@ class BaseFeature(abc.ABC):
         raise NotImplementedError
 
     def get_description(self):
-        if self.__call__.__doc__ is not None and len(self.__call__.__doc__.strip()) > 1:
+        if self.__call__.__doc__ is not None and len(self.__call__.__doc__.strip()) > 0:
             warnings.warn("please override method get_description(self) instead of using method documentation of __call__(self)", DeprecationWarning)
             return self.__call__.__doc__
         else:
@@ -18,7 +17,7 @@ class BaseFeature(abc.ABC):
 
 
 class SingletonFeature:
-    # singleton class variable
+    # class variable to implement singleton
     _instance_lock = threading.Lock()
     _instance_dict = dict()
 
@@ -30,15 +29,3 @@ class SingletonFeature:
                 SingletonFeature._instance_dict[cls.__name__] = _instance
         return SingletonFeature._instance_dict[cls.__name__]
 
-
-class RunCallable(BaseFeature):
-    def __init__(self, func: Callable, *args: object, **kwargs: object) -> None:
-        self.func = func
-        self.args = args
-        self.kwargs = kwargs
-
-    def __call__(self):
-        self.func(*self.args, **self.kwargs)
-
-    def get_description(self):
-        return f"执行函数 {self.func.__name__},args={self.args},kwargs={self.kwargs}"
