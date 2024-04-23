@@ -10,25 +10,26 @@ from . import simple_features, base_feature, win_features
 
 class MyHook:
     def __init__(self, config_path="hotkey_map.yml"):
-        self.config_path = config_path
-        self.hook_manager = PyHook3.HookManager()
-        self._key_map = dict()  # {key:(feature,keep_old_key)}
-        self._stop_hooking_feature = hotkey_features.RunCallable(self._stop_hooking)
-        self.config = self._init_config()
-        self.stop_hooking_feature_binded = False
 
+        self._key_map = dict()  # {key:(feature,keep_old_key)}
+        self._stop_hooking_feature = simple_features.RunCallable(self._stop_hooking)
+        self.stop_hooking_feature_binded_status = False
+
+        self.config = self._init_config(config_path)
+        self.hook_manager = PyHook3.HookManager()
         self._init_feature_binding()
         self._init_hotkey_binding()
         self._init_command_binding()
 
-    def _init_config(self) -> dict:
-        assert os.path.isfile(self.config_path)
+    @staticmethod
+    def _init_config(config_path: str) -> dict:
+        assert os.path.isfile(config_path)
         try:
-            with open(self.config_path, "r", encoding="utf8") as f:
+            with open(config_path, "r", encoding="utf8") as f:
                 config = yaml.safe_load(f)
                 return config
         except IOError:
-            raise IOError("配置文件 hotkey_map.yml 读取失败")
+            raise IOError(f"配置文件 f{config_path} 读取失败")
 
     def _atomic_bind_key(self, key_code: str, feature: base_feature.BaseFeature, keep_old_key: bool):
         if key_code in self._key_map:
@@ -60,7 +61,7 @@ class MyHook:
                 # TODO: unit test
             elif feature_cls_name == "StopHooking":
                 feature = self._stop_hooking_feature
-                self.stop_hooking_feature_binded = True
+                self.stop_hooking_feature_binded_status = True
             else:
                 raise ValueError(f"未知命令:{feature_cls_name}")
             self._atomic_bind_key(key_code, feature, keep_old_key)
@@ -70,7 +71,7 @@ class MyHook:
             return
         for key_code in self.config["hotkey_binding"]:
             new_key: str = self.config["hotkey_binding"][key_code]
-            feature = hotkey_features.Hotkey(new_key)
+            feature = simple_features.Hotkey(new_key)
             self._atomic_bind_key(key_code, feature, False)
 
     def _init_command_binding(self):
@@ -78,7 +79,7 @@ class MyHook:
             return
         for key_code in self.config["command_binding"]:
             command: str = self.config["command_binding"][key_code]
-            feature = hotkey_features.RunCommand(command)
+            feature = simple_features.RunCommand(command)
             self._atomic_bind_key(key_code, feature, False)
 
     def manual_binding(self, key: str, feature: base_feature.BaseFeature, keep_old_key: bool):
@@ -88,7 +89,7 @@ class MyHook:
             print(e.args[0])
 
     def _confirm_stop_hooking_was_binded(self):
-        if not self.stop_hooking_feature_binded:
+        if not self.stop_hooking_feature_binded_status:
             self._atomic_bind_key("Snapshot", self._stop_hooking_feature, False)
 
     def on_keyboard_event(self, event: PyHook3.KeyboardEvent):
