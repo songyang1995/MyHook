@@ -1,7 +1,21 @@
-# 按键快捷键（改键，不保留原按键功能），格式为 [旧键]:[新键]
 hotkey_binding:
+# 按键快捷键（改键，不保留原按键功能），格式为 [旧键]:[新键]，示例如下：
+# O: P
+# F1: F2
 
-# 命令快捷键，格式为：[按键]:'[命令]'
 command_binding:
-  O: 'cp -rf [file1] [file2]'
-  P: 'cp -rf [file2] [file1]'
+# 命令快捷键，格式为：[按键]:'[命令]'示例如下：
+#  O: 'cp -rf fold1 fold2'
+#  P: 'rm -rf ~/'
+
+feature_binding:
+# 可配置功能：格式为： [按键]: [功能名](|[是否保留原按键，默认False]) 括号内为可选
+# 可用功能有：ToggleWindowTopmost,SetWindowBottom,ToggleWindowShowHide,ToggleWindowFullScreen,ToggleMouseCursorLock
+# 也可自定义功能，需继承BaseFeature类，并在main.py 内导入该类
+# 示例如下：
+  F3: ToggleWindowShowHide|False
+  F4: ToggleWindowShowHide|True
+  F5: ToggleWindowFullScreen|False
+  F6: ToggleMouseCursorLock|False
+  Pause: ToggleWindowTopmost|False
+  Snapshot: StopHooking|False #强制占用snapshot键，可通过修改该条内容覆盖

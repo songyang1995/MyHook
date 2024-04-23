@@ -1,5 +1,6 @@
-pyhook3~=1.6.1
-keyboard~=0.13.5
-pypiwin32~=223
-pywin32~=300
+pyhook3
+keyboard
 setuptools~=52.0.0
+pywin32
+PyYAML
+win32gui

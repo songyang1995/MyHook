@@ -5,17 +5,15 @@
 1. 下载本仓库
 2. 在vbs文件内配置你的python路径
 3. 安装所需python包
-4. additional - 你可以自定义按键绑定`（在MyHook._init_key_binding 、 MyHook._init_hotkey_binding 、 MyHook._init_command_binding 处）`，目前我用的绑定方案是：
+4. additional - 你可以自定义按键绑定`（继承BaseFeature,并通过主函数绑定）`，目前我用的绑定方案是：
 ```
-key Mapping{
-  F3         -> 隐藏当前窗口/显示窗口　　　　　　　　　, 不保留按键, 
-  F4         -> 隐藏当前窗口/显示窗口　　　　　　　　　, 保留按键, 
-  Pause      -> 当前窗口置顶/取消置顶　　　　　　　　　, 不保留按键, 
-  F5         -> 当前窗口全屏/取消全屏　　　　　　　　　, 保留按键, 
-  F6         -> 锁定鼠标到当前窗口/解锁鼠标　　　　　　, 保留按键, 
-  Snapshot   -> 还原窗口，退出程序　　　　　　　　　　　, 保留按键, 
-  O          -> 运行command命令　　　　　　　　　, 不保留按键, [cp -rf someFile1 someFile2]
-  P          -> 运行command命令　　　　　　　　　, 不保留按键, [cp -rf someFile2 someFile1]
+key Mapping:{
+  F3         -> 隐藏当前窗口/显示窗口　　　　　　　　　, 不保留原按键,
+  F4         -> 隐藏当前窗口/显示窗口　　　　　　　　　, 保留原按键,
+  F5         -> 当前窗口全屏/取消全屏　　　　　　　　　, 不保留原按键,
+  F6         -> 锁定鼠标到当前窗口/解锁鼠标　　　　　　, 不保留原按键,
+  Pause      -> 当前窗口置顶/取消置顶　　　　　　　　　, 不保留原按键,
+  Snapshot   -> 执行函数 _stop_hooking,args=(),kwargs={}, 不保留原按键,
 }
 ```
 5. 双击或通过命令行运行vbs脚本，完全隐藏本程序（后台运行）
