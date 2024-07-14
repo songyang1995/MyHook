@@ -13,7 +13,7 @@ class MyHook:
 
         self._key_map = dict()  # {key:(feature,keep_old_key)}
         self._stop_hooking_feature = simple_features.RunCallable(self._stop_hooking)
-        self.stop_hooking_feature_binded_status = False
+        self.stop_hooking_feature_bound_status = False
 
         self.config = self._init_config(config_path)
         self.hook_manager = PyHook3.HookManager()
@@ -41,29 +41,28 @@ class MyHook:
         assert "feature_binding" in self.config
         for key_code in self.config["feature_binding"]:
 
-            feature_desc: str = self.config["feature_binding"][key_code]
-            # parse feature_desc into feature and keep_old_key
-            if len(feature_desc.split("|")) == 2:
-                feature_cls_name, keep_old_key = feature_desc.split("|")
-                feature_cls_name = feature_cls_name.strip()
-                assert keep_old_key in ("False", "True")
-                keep_old_key: bool = keep_old_key == "True"
-            elif len(feature_desc.split("|")) == 1:
-                feature_cls_name, keep_old_key = feature_desc.strip(), False
-            else:
-                raise ValueError(f"配置项出错：feature_binding->{key_code}->{feature_desc}")
+            # extract feature and bind key from config
+            bind_dict = self.config["feature_binding"][key_code]
+            assert "feature" in bind_dict and len(bind_dict) <= 2
+            if len(bind_dict) == 2:
+                assert "keep_key" in bind_dict and isinstance(bind_dict["keep_key"], bool)
+            feature_cls_name: str = bind_dict["feature"]
+            keep_old_key: bool = bind_dict.get("keep_key", False)
+
             # find feature_class and create feature instance
+
+            feature: base_feature.BaseFeature
             if feature_cls_name in win_features.__dict__ and issubclass(win_features.__dict__[feature_cls_name], win_features.BaseFeature):
                 # 找到对应的类
-                feature: base_feature.BaseFeature = win_features.__dict__[feature_cls_name]()
+                feature = win_features.__dict__[feature_cls_name]()
             elif feature_cls_name in globals().keys() and issubclass(globals()[feature_cls_name], win_features.BaseFeature):
-                feature: base_feature.BaseFeature = globals()[feature_cls_name]()
-                # TODO: unit test
+                feature = globals()[feature_cls_name]()
             elif feature_cls_name == "StopHooking":
                 feature = self._stop_hooking_feature
-                self.stop_hooking_feature_binded_status = True
+                self.stop_hooking_feature_bound_status = True
             else:
                 raise ValueError(f"未知命令:{feature_cls_name}")
+
             self._atomic_bind_key(key_code, feature, keep_old_key)
 
     def _init_hotkey_binding(self):
@@ -73,6 +72,7 @@ class MyHook:
             new_key: str = self.config["hotkey_binding"][key_code]
             feature = simple_features.Hotkey(new_key)
             self._atomic_bind_key(key_code, feature, False)
+        return
 
     def _init_command_binding(self):
         if "command_binding" not in self.config or self.config["command_binding"] is None or len(self.config["command_binding"]) == 0:
@@ -88,8 +88,8 @@ class MyHook:
         except KeyError as e:
             print(e.args[0])
 
-    def _confirm_stop_hooking_was_binded(self):
-        if not self.stop_hooking_feature_binded_status:
+    def _confirm_stop_hooking_was_bound(self):
+        if not self.stop_hooking_feature_bound_status:
             self._atomic_bind_key("Snapshot", self._stop_hooking_feature, False)
 
     def on_keyboard_event(self, event: PyHook3.KeyboardEvent):
@@ -103,12 +103,13 @@ class MyHook:
         return True
 
     def start_hooking(self):
-        self._confirm_stop_hooking_was_binded()
+        self._confirm_stop_hooking_was_bound()
         self.hook_manager.KeyDown = self.on_keyboard_event
         self.hook_manager.HookKeyboard()
         pythoncom.PumpMessages()
 
     def _stop_hooking(self):
+        """退出"""
         win32api.PostQuitMessage()
         self.hook_manager.UnhookKeyboard()
 
@@ -116,19 +117,18 @@ class MyHook:
         """描述按键绑定状态"""
         key_bind_str = "key Mapping:{\n"
         for key in self._key_map:
-            feature, keep_old_key = self._key_map[key]
             feature: base_feature.BaseFeature
-            key_bind_str += f"  {key:<10} -> {feature.get_description():　<20}, {'保留原按键' if keep_old_key else '不保留原按键'},\n"
+            feature, keep_old_key = self._key_map[key]
+            key_bind_str += f"  {key:<10} -> {feature.get_description():　<30}, {'保留原按键' if keep_old_key else '不保留原按键'},\n"
 
         key_bind_str += "}"
         return key_bind_str
 
-
-def main():
-    my_hook = MyHook()
-    print(my_hook.key_binding_status())
-    my_hook.start_hooking()
-
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     my_hook = MyHook()
+#     print(my_hook.key_binding_status())
+#     my_hook.start_hooking()
+#
+#
+# if __name__ == "__main__":
+#     main()

@@ -1,0 +1,19 @@
+[project]
+name = "MyHook"
+version = "1.0.0"
+dependencies = [
+    "pywin32",
+    "keyboard"
+]
+
+
+[tool.mypy]
+check_untyped_defs = true
+[[tool.mypy.overrides]]
+module = [
+    "win32gui",
+    "win32con",
+    "keyboard",
+    "PyHook3"
+]
+ignore_missing_imports = true

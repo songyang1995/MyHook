@@ -1,14 +1,14 @@
-from ctypes import windll, byref, Structure, c_short
+from ctypes import windll, byref, Structure, c_int
 import win32gui
 import win32con
 
-from .base_feature import BaseFeature, SingletonFeature
+from .base_feature import BaseFeature, Singleton
 
 
-class ToggleWindowTopmost(BaseFeature, SingletonFeature):
+class ToggleWindowTopmost(BaseFeature, Singleton):
     def __call__(self):
         """切换活跃窗口置顶状态"""
-        hwnd = windll.user32.GetForegroundWindow()
+        hwnd = windll.user32.GetForegroundWindow()  # also worked as win23gui.GetForegroundWindow()
         if win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE) & win32con.WS_EX_TOPMOST:  # 判断当前窗口是否置顶
             win32gui.SetWindowPos(hwnd, win32con.HWND_NOTOPMOST, 0, 0, 0, 0,
                                   win32con.SWP_SHOWWINDOW
@@ -28,7 +28,7 @@ class ToggleWindowTopmost(BaseFeature, SingletonFeature):
         return "当前窗口置顶/取消置顶"
 
 
-class SetWindowBottom(BaseFeature, SingletonFeature):
+class SetWindowBottom(BaseFeature, Singleton):
     def __call__(self):
         """将当前窗口完全隐藏"""
         hwnd = windll.user32.GetForegroundWindow()
@@ -44,7 +44,7 @@ class SetWindowBottom(BaseFeature, SingletonFeature):
         return "将当前窗口完全隐藏"
 
 
-class ToggleWindowShowHide(BaseFeature, SingletonFeature):
+class ToggleWindowShowHide(BaseFeature, Singleton):
     def __init__(self):
         self.hidden_hwnd = None
 
@@ -88,7 +88,7 @@ class ToggleWindowShowHide(BaseFeature, SingletonFeature):
                               )
 
 
-class ToggleWindowFullScreen(BaseFeature, SingletonFeature):
+class ToggleWindowFullScreen(BaseFeature, Singleton):
     def __call__(self):
         """切换窗口全屏状态
         :TODO: 已知错误：仅对WIN7 API以后窗口有效，部分老式窗口无效
@@ -114,15 +114,18 @@ class ToggleWindowFullScreen(BaseFeature, SingletonFeature):
         return "当前窗口全屏/取消全屏"
 
 
-class ToggleMouseCursorLock(BaseFeature, SingletonFeature):
+class ToggleMouseCursorLock(BaseFeature, Singleton):
     class _Rect(Structure):
         """内部类，和Windows API交互，获取鼠标活动区域"""
         _fields_ = [
-            ('top', c_short),
-            ('left', c_short),
-            ('bottom', c_short),
-            ('right', c_short)
+            ('left', c_int),
+            ('top', c_int),
+            ('right', c_int),
+            ('bottom', c_int)
         ]
+
+        def to_tuple(self) -> tuple[int, int, int, int]:
+            return self.left, self.top, self.right, self.bottom
 
     def __init__(self):
         self.cursorLocked = False
@@ -137,12 +140,15 @@ class ToggleMouseCursorLock(BaseFeature, SingletonFeature):
             hwnd = windll.user32.GetForegroundWindow()
             # title = win32gui.GetWindowText(hwnd)
             rect = self._Rect()
+            # win32api.GetWindowRect不准，会包括投影。。。 使用 windll.user32.GetClientRect + windll.user32.MapWindowPoints 获取窗口矩形
             windll.user32.GetClientRect(hwnd, byref(rect))
             windll.user32.MapWindowPoints(hwnd, None, byref(rect), 2)
 
             windll.user32.ClipCursor(byref(rect))
             self.cursorLocked = True
-            # ref @https://codingdict.com/sources/py/pyglet/17307.html
+            # see: @https://mhammond.github.io/pywin32/
+            # see: @https://codingdict.com/sources/py/pyglet/17307.html
+
 
     def get_description(self):
         return "锁定鼠标到当前窗口/解锁鼠标"

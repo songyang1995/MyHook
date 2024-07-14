@@ -45,4 +45,7 @@ class RunCallable(BaseFeature):
         return self.func(*self.args, **self.kwargs)
 
     def get_description(self):
-        return f"执行函数 {self.func.__name__},args={self.args},kwargs={self.kwargs}"
+        description: str = self.func.__name__
+        if self.func.__doc__ is not None and len(self.func.__doc__.strip()) > 0:
+            description += "(" + self.func.__doc__.strip() + ")"
+        return f"执行函数<{description}>, args={self.args=}, kwargs={self.kwargs}"
