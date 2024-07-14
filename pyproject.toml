@@ -3,7 +3,9 @@ name = "MyHook"
 version = "1.0.0"
 dependencies = [
     "pywin32",
-    "keyboard"
+    "keyboard",
+    "PyHook3",
+    "PyYAML",
 ]
 
 
