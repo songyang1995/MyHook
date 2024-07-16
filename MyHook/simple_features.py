@@ -1,8 +1,9 @@
 import os
 from typing import Callable
 
-from .base_feature import BaseFeature
 import keyboard
+
+from .base_feature import BaseFeature
 
 
 class Hotkey(BaseFeature):

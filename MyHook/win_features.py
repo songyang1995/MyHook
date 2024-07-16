@@ -1,6 +1,7 @@
 from ctypes import windll, byref, Structure, c_int
-import win32gui
+
 import win32con
+import win32gui
 
 from .base_feature import BaseFeature, Singleton
 

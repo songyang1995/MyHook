@@ -19,3 +19,25 @@ module = [
     "PyHook3"
 ]
 ignore_missing_imports = true
+
+
+[tool.poetry]
+name = "myhook"
+version = "1.0.0"
+description = ""
+authors = ["songyang <songyang95@foxmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pyyaml = "^6.0.1"
+pywin32 = "^306"
+keyboard = "^0.13.5"
+pyhook3 = "^1.6.1"
+types-pyyaml = "^6.0.12.20240311"
+types-pywin32 = "^306.0.0.20240408"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
