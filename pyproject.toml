@@ -1,5 +1,5 @@
 [project]
-name = "MyHook"
+name = "myhook"
 version = "1.0.0"
 dependencies = [
     "pywin32",
@@ -20,6 +20,11 @@ module = [
 ]
 ignore_missing_imports = true
 
+[tool.pylint.main]
+max-line-length = 180
+
+[tool.pylint."messages control"]
+disable = ["missing-module-docstring","missing-function-docstring","no-else-return","missing-class-docstring","no-member","c-extension-no-member"]
 
 [tool.poetry]
 name = "myhook"

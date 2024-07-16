@@ -1,4 +1,4 @@
-from MyHook import MyHook
+from myhook import MyHook
 
 
 def main():
