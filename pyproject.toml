@@ -24,7 +24,7 @@ ignore_missing_imports = true
 max-line-length = 180
 
 [tool.pylint."messages control"]
-disable = ["missing-module-docstring","missing-function-docstring","no-else-return","missing-class-docstring","no-member","c-extension-no-member"]
+disable = ["missing-module-docstring","missing-function-docstring","no-else-return","missing-class-docstring","no-member","c-extension-no-member","import-error"]
 
 [tool.poetry]
 name = "myhook"
