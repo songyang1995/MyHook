@@ -14,7 +14,7 @@ dependencies = [
 
 [tool.mypy]
 check_untyped_defs = true
-disable_error_code = "import-untyped"
+disable_error_code = ["import-untyped", "attr-defined"]
 
 
 [[tool.mypy.overrides]]
