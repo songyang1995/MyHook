@@ -6,6 +6,9 @@ dependencies = [
     "keyboard",
     "PyHook3",
     "PyYAML",
+    "types-pyyaml",
+    "types-keyboard",
+    "types-pywin32"
 ]
 
 
@@ -18,6 +21,7 @@ module = [
     "keyboard",
     "PyHook3"
 ]
+
 ignore_missing_imports = true
 
 [tool.pylint.main]
