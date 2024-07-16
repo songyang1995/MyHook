@@ -21,3 +21,5 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files 'myhook/*.py')
+    - name: Mypy Check
+      uses: jpetrucciani/mypy-check@0.991
