@@ -150,6 +150,5 @@ class ToggleMouseCursorLock(BaseFeature, Singleton):
             # see: @https://mhammond.github.io/pywin32/
             # see: @https://codingdict.com/sources/py/pyglet/17307.html
 
-
     def get_description(self):
         return "锁定鼠标到当前窗口/解锁鼠标"
