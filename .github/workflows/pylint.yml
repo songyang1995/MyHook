@@ -14,14 +14,10 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: mmomtchev/setup-swig@v1
-    - name: Verify swig
-      run: swig -version
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pylint
-        pip install MyHook
     - name: Analysing the code with pylint
       run: |
         pylint $(git ls-files '*.py')
